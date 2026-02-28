@@ -137,6 +137,7 @@ export const arkDinosaurs = [
   { name: 'Shastasaurus', types: [1, 3] },
   { name: 'Tusoteuthis', types: [1, 3] },
   { name: 'Deinosuchus', types: [1, 3] },
+  { name: 'Grand Tortugar', types: [2, 3] },
   { name: 'Maeguana', types: [2, 3] },
   { name: 'Xiphactinus', types: [1, 3] },
 
