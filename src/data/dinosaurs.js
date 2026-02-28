@@ -235,6 +235,7 @@ export const arkDinosaurs = [
   { name: 'Aberrant Titanoboa', types: [1] },
   { name: 'Aberrant Loutre', types: [1, 5] },
   { name: 'Aberrant Fasolasuchus', types: [1] },
+  { name: 'Aberrant Gigantoraptor', types: [2] },
 
   // ===== VARIANTES TEK =====
   { name: 'Tek Parasaur', types: [2] },
