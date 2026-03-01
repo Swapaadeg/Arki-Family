@@ -84,9 +84,9 @@ const TribeCustomization = () => {
     }
   }, [tribe]);
 
-  // Rediriger si pas owner
+  // Rediriger si pas de tribu
   useEffect(() => {
-    if (!tribeLoading && tribe && tribe.user_role !== 'owner') {
+    if (!tribeLoading && !tribe) {
       navigate('/tribe');
     }
   }, [tribe, tribeLoading, navigate]);
