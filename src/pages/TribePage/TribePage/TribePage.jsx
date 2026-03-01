@@ -22,9 +22,7 @@ const TribePage = () => {
   useEffect(() => {
     if (tribe) {
       loadFeaturedDinos();
-      if (tribe.user_role === 'owner') {
-        loadPendingRequests();
-      }
+      loadPendingRequests();
     }
   }, [tribe]);
 
@@ -202,29 +200,24 @@ const TribePage = () => {
           {isOwner ? 'Gérer les dinosaures' : 'Voir tous les dinosaures'}
         </button>
 
-        {isOwner && (
-          <Link
-            to="/tribe/customize"
-            className="tribe-page__btn tribe-page__btn--secondary"
-          >
-            <span className="tribe-page__btn-icon">🎨</span>
-            Personnaliser
-          </Link>
-        )}
+        <Link
+          to="/tribe/customize"
+          className="tribe-page__btn tribe-page__btn--secondary"
+        >
+          <span className="tribe-page__btn-icon">🎨</span>
+          Personnaliser
+        </Link>
 
         <button
           className="tribe-page__btn tribe-page__btn--accent"
           onClick={() => {
-            // Recharger les demandes avant d'ouvrir la modal
-            if (isOwner) {
-              loadPendingRequests();
-            }
+            loadPendingRequests();
             setIsModalOpen(true);
           }}
         >
           <span className="tribe-page__btn-icon">👥</span>
           Gérer la tribu
-          {isOwner && pendingRequests.length > 0 && ` (${pendingRequests.length})`}
+          {pendingRequests.length > 0 && ` (${pendingRequests.length})`}
         </button>
       </div>
 
