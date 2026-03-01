@@ -60,36 +60,32 @@ function handleGet($pdo, $user) {
             return;
         }
 
-        // Si owner, récupérer les demandes en attente
-        if ($membership['role'] === 'owner') {
-            $stmt = $pdo->prepare("
-                SELECT tm.id, tm.user_id, tm.request_message,
-                       u.username, u.email, u.photo_profil
-                FROM tribe_members tm
-                JOIN users u ON tm.user_id = u.id
-                WHERE tm.tribe_id = ? AND tm.is_validated = 0
-                ORDER BY tm.id ASC
-            ");
-            $stmt->execute([$membership['tribe_id']]);
-            $requests = $stmt->fetchAll();
+        // Tout membre validé peut voir les demandes en attente
+        $stmt = $pdo->prepare("
+            SELECT tm.id, tm.user_id, tm.request_message,
+                   u.username, u.email, u.photo_profil
+            FROM tribe_members tm
+            JOIN users u ON tm.user_id = u.id
+            WHERE tm.tribe_id = ? AND tm.is_validated = 0
+            ORDER BY tm.id ASC
+        ");
+        $stmt->execute([$membership['tribe_id']]);
+        $requests = $stmt->fetchAll();
 
-            error_log("[tribe-members] Found " . count($requests) . " pending requests for tribe " . $membership['tribe_id']);
+        error_log("[tribe-members] Found " . count($requests) . " pending requests for tribe " . $membership['tribe_id']);
 
-            $result = array_map(function($req) {
-                return [
-                    'id' => (int)$req['id'],
-                    'user_id' => (int)$req['user_id'],
-                    'username' => $req['username'],
-                    'email' => $req['email'],
-                    'avatar_url' => $req['photo_profil'],
-                    'request_message' => $req['request_message']
-                ];
-            }, $requests);
+        $result = array_map(function($req) {
+            return [
+                'id' => (int)$req['id'],
+                'user_id' => (int)$req['user_id'],
+                'username' => $req['username'],
+                'email' => $req['email'],
+                'avatar_url' => $req['photo_profil'],
+                'request_message' => $req['request_message']
+            ];
+        }, $requests);
 
-            sendJsonResponse(['requests' => $result]);
-        } else {
-            sendJsonResponse(['requests' => []]);
-        }
+        sendJsonResponse(['requests' => $result]);
 
     } catch (PDOException $e) {
         sendJsonError('Erreur lors de la récupération des demandes: ' . $e->getMessage(), 500);
@@ -201,9 +197,14 @@ function handlePut($pdo, $user) {
             return;
         }
 
-        // Vérifier que l'utilisateur est le owner
-        if ($request['owner_id'] != $user['id']) {
-            sendJsonError('Seul le propriétaire peut gérer les demandes', 403);
+        // Vérifier que l'utilisateur est un membre validé de la tribu
+        $stmt = $pdo->prepare("
+            SELECT id FROM tribe_members
+            WHERE tribe_id = ? AND user_id = ? AND is_validated = 1
+        ");
+        $stmt->execute([$request['tribe_id'], $user['id']]);
+        if (!$stmt->fetch()) {
+            sendJsonError('Tu dois être membre de la tribu pour gérer les demandes', 403);
             return;
         }
 

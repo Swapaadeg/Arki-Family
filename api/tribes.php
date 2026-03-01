@@ -273,8 +273,8 @@ function handlePut($user) {
         $stmt->execute([$tribeId, $user['id']]);
         $member = $stmt->fetch();
 
-        if (!$member || $member['role'] !== 'owner') {
-            sendJsonError('Seul le propriétaire peut modifier la tribu', 403);
+        if (!$member) {
+            sendJsonError('Tu dois être membre de la tribu pour la modifier', 403);
             return;
         }
 
@@ -392,8 +392,8 @@ function handleDelete($user) {
         $stmt->execute([$tribeId, $user['id']]);
         $member = $stmt->fetch();
 
-        if (!$member || $member['role'] !== 'owner') {
-            sendJsonError('Seul le propriétaire peut supprimer la tribu', 403);
+        if (!$member) {
+            sendJsonError('Tu dois être membre de la tribu pour la supprimer', 403);
             return;
         }
 

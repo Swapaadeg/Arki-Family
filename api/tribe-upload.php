@@ -71,12 +71,6 @@ try {
         return;
     }
 
-    // Vérifier que l'utilisateur est owner
-    if ($tribe['role'] !== 'owner') {
-        sendJsonError('Seul le propriétaire de la tribu peut uploader des images', 403);
-        return;
-    }
-
     $tribeId = $tribe['id'];
 
     // Créer le dossier de la tribu si nécessaire
