@@ -61,6 +61,7 @@ export const arkDinosaurs = [
   { name: 'Paraceratherium', types: [2] },
   { name: 'Parasaur', types: [2] },
   { name: 'Phiomia', types: [2] },
+  { name: 'Procoptodon', types: [2] },
   { name: 'Stegosaurus', types: [2] },
   { name: 'Triceratops', types: [2] },
   { name: 'Rhinocéros Laineux', types: [2] },
