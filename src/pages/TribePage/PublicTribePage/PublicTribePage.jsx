@@ -119,7 +119,7 @@ const PublicTribePage = () => {
       {/* Logo Arki'Family centré */}
       <Link to="/" className="tribe-page__home-logo-link">
         <img
-          src="/assets/seasonal/printemps/logo-printemps.png"
+          src="/assets/seasonal/printemps/logo-paques.png"
           alt="Arki'Family"
           className="tribe-page__home-logo"
         />

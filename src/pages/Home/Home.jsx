@@ -58,7 +58,7 @@ const Home = () => {
         {/* Logo cliquable */}
         <Link to="/" className="home__logo-link">
           <img
-            src="/assets/seasonal/printemps/logo-printemps.png"
+            src="/assets/seasonal/printemps/logo-paques.png"
             alt="Arki'Family Logo"
             className="home__logo"
           />

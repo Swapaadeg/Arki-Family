@@ -65,7 +65,7 @@ const Header = () => {
       <header className="header">
         <Link to="/" className="header__logo-link">
           <img
-            src="/assets/seasonal/printemps/logo-printemps.png"
+            src="/assets/seasonal/printemps/logo-paques.png"
             alt="Arki'Family"
             className="header__logo"
           />
