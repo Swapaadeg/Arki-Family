@@ -106,7 +106,7 @@ const TribePage = () => {
   }
 
   const isOwner = tribe.user_role === 'owner';
-  const bannerUrl = tribe.banner_url || '/assets/seasonal/printemps/printemps.png';
+  const bannerUrl = tribe.banner_url || '/assets/seasonal/printemps/banner-paques.png';
 
   const pageStyle = {
     ...tribeStyle,

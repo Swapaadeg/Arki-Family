@@ -71,7 +71,7 @@ const Header = () => {
           />
         </Link>
         <img
-          src="/assets/seasonal/printemps/printemps.png"
+          src="/assets/seasonal/printemps/banner-paques.png"
           alt="Arki-Family Printemps"
           className="header__banner"
         />

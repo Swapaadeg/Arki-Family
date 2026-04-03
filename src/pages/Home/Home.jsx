@@ -21,7 +21,7 @@ const Home = () => {
       {/* Banner en arrière-plan */}
       <div className="home__banner">
         <img
-          src="/assets/seasonal/printemps/printemps.png"
+          src="/assets/seasonal/printemps/banner-paques.png"
           alt="Arki'Family - Printemps"
           className="home__banner-image"
         />
