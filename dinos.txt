@@ -1,6 +1,7 @@
-Liste des dinos - Arki-family (227 créatures)
+Liste des dinos - Arki-family (229 créatures)
 ========================================================
 
+Aberrant Achatina
 Aberrant Ankylosaurus
 Aberrant Arthropleura
 Aberrant Baryonyx
@@ -26,6 +27,7 @@ Aberrant Smilodon
 Aberrant Spinosaure
 Aberrant Stegosaurus
 Aberrant Titanoboa
+Achatina
 Acrocanthosaurus
 Allosaurus
 Amargasaurus

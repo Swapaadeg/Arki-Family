@@ -143,6 +143,7 @@ export const arkDinosaurs = [
   { name: 'Xiphactinus', types: [1, 3] },
 
   // ===== DINOS D'ÉPAULE =====
+  { name: 'Achatina', types: [2, 3, 5] },
   { name: 'Bulbdog', types: [2, 5] },
   { name: 'Plumineux', types: [2, 5] },
   { name: 'Chat', types: [2, 5] },
@@ -212,6 +213,7 @@ export const arkDinosaurs = [
   { name: 'Drakeling', types: [1, 4, 5] },
 
   // ===== VARIANTES ABERRANT =====
+  { name: 'Aberrant Achatina', types: [2, 3, 5] },
   { name: 'Aberrant Arthropleura', types: [1] },
   { name: 'Aberrant Baudroie Abyssale', types: [1, 3] },
   { name: 'Aberrant Ankylosaurus', types: [2] },
