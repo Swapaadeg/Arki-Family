@@ -21,6 +21,7 @@ import MentionsLegales from './pages/Legal/MentionsLegales';
 import PolitiqueConfidentialite from './pages/Legal/PolitiqueConfidentialite';
 import CGU from './pages/Legal/CGU';
 import { TutoShiny, TutoScanner, TutoMutations } from './pages/Guides';
+import ColorSimulator from './pages/ColorSimulator/ColorSimulator';
 import './styles/main.scss';
 
 function App() {
@@ -52,6 +53,7 @@ function App() {
             <Route path="/guides/shiny" element={<TutoShiny />} />
             <Route path="/guides/scanner" element={<TutoScanner />} />
             <Route path="/guides/mutations" element={<TutoMutations />} />
+            <Route path="/couleurs" element={<ColorSimulator />} />
           </Routes>
         </Router>
       </AuthProvider>
