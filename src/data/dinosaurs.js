@@ -197,6 +197,7 @@ export const arkDinosaurs = [
   { name: 'Aberrant Baryonyx', types: [1, 3] },
   { name: 'Aberrant Carnotaurus', types: [1] },
   { name: 'Aberrant Dimetrodon', types: [1] },
+  { name: 'Aberrant Dimorphodon', types: [1, 4, 5] },
   { name: 'Aberrant Diplocaulus', types: [2, 3] },
   { name: 'Aberrant Dire Bear', types: [1] },
   { name: 'Aberrant Doedicurus', types: [2] },
