@@ -24,7 +24,7 @@ const STATS = [
   { key: 'crafting', label: 'Craft' },
 ];
 
-const EMPTY_FORM = { name: '', types: [], stats: [], sort_order: 0 };
+const EMPTY_FORM = { name: '', types: [], stats: [] };
 
 const DinosManagement = () => {
   const navigate = useNavigate();
@@ -77,10 +77,9 @@ const DinosManagement = () => {
   const openEdit = (sp) => {
     setEditingId(sp.id);
     setForm({
-      name:       sp.name,
-      types:      sp.types.map(Number),
-      stats:      sp.stats ?? [],
-      sort_order: sp.sort_order,
+      name:  sp.name,
+      types: sp.types.map(Number),
+      stats: sp.stats ?? [],
     });
     setFormError(null);
     setShowForm(true);
@@ -124,7 +123,7 @@ const DinosManagement = () => {
     try {
       setSaving(true);
       setFormError(null);
-      const payload = { ...form, name: form.name.trim() };
+      const payload = { name: form.name.trim(), types: form.types, stats: form.stats };
       if (editingId) {
         await api.put(`/admin/dino-species.php?id=${editingId}`, payload);
       } else {
@@ -198,14 +197,13 @@ const DinosManagement = () => {
                   <th>Nom</th>
                   <th>Types</th>
                   <th>Stats</th>
-                  <th>Ordre</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="dinos-management__empty-row">
+                    <td colSpan={4} className="dinos-management__empty-row">
                       {search ? 'Aucun résultat' : 'Aucune espèce enregistrée'}
                     </td>
                   </tr>
@@ -231,7 +229,6 @@ const DinosManagement = () => {
                           ))}
                         </div>
                       </td>
-                      <td className="dinos-management__order">{sp.sort_order}</td>
                       <td className="dinos-management__actions-cell">
                         <button
                           className="dinos-management__edit-btn"
@@ -309,16 +306,7 @@ const DinosManagement = () => {
                   </div>
                 </div>
 
-                <div className="dinos-management__field dinos-management__field--half">
-                  <label>Ordre d'affichage</label>
-                  <input
-                    type="number"
-                    value={form.sort_order}
-                    onChange={e => setForm(f => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))}
-                    min={0}
-                    disabled={saving}
-                  />
-                </div>
+
 
                 {formError && (
                   <div className="dinos-management__form-error">{formError}</div>

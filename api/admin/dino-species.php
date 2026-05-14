@@ -27,15 +27,14 @@ switch ($method) {
 
 function handleGet($pdo) {
     try {
-        $stmt = $pdo->query('SELECT id, name, types, stats, sort_order FROM dino_species ORDER BY sort_order ASC, name ASC');
+        $stmt = $pdo->query('SELECT id, name, types, stats FROM dino_species ORDER BY name ASC');
         $rows = $stmt->fetchAll();
         $result = array_map(function($row) {
             return [
-                'id'         => (int)$row['id'],
-                'name'       => $row['name'],
-                'types'      => json_decode($row['types']) ?? [],
-                'stats'      => json_decode($row['stats']) ?? [],
-                'sort_order' => (int)$row['sort_order'],
+                'id'    => (int)$row['id'],
+                'name'  => $row['name'],
+                'types' => json_decode($row['types']) ?? [],
+                'stats' => json_decode($row['stats']) ?? [],
             ];
         }, $rows);
         sendJsonResponse($result);
@@ -49,12 +48,11 @@ function handlePost($pdo) {
     validateInput($input);
 
     try {
-        $stmt = $pdo->prepare('INSERT INTO dino_species (name, types, stats, sort_order) VALUES (:name, :types, :stats, :sort_order)');
+        $stmt = $pdo->prepare('INSERT INTO dino_species (name, types, stats) VALUES (:name, :types, :stats)');
         $stmt->execute([
-            ':name'       => sanitizeText($input['name'], 100),
-            ':types'      => json_encode($input['types']),
-            ':stats'      => json_encode($input['stats']),
-            ':sort_order' => (int)($input['sort_order'] ?? 0),
+            ':name'  => sanitizeText($input['name'], 100),
+            ':types' => json_encode($input['types']),
+            ':stats' => json_encode($input['stats']),
         ]);
         sendJsonResponse(['id' => (int)$pdo->lastInsertId(), 'message' => 'Espèce créée avec succès'], 201);
     } catch (PDOException $e) {
@@ -72,13 +70,12 @@ function handlePut($pdo) {
     validateInput($input);
 
     try {
-        $stmt = $pdo->prepare('UPDATE dino_species SET name = :name, types = :types, stats = :stats, sort_order = :sort_order WHERE id = :id');
+        $stmt = $pdo->prepare('UPDATE dino_species SET name = :name, types = :types, stats = :stats WHERE id = :id');
         $stmt->execute([
-            ':name'       => sanitizeText($input['name'], 100),
-            ':types'      => json_encode($input['types']),
-            ':stats'      => json_encode($input['stats']),
-            ':sort_order' => (int)($input['sort_order'] ?? 0),
-            ':id'         => $id,
+            ':name'  => sanitizeText($input['name'], 100),
+            ':types' => json_encode($input['types']),
+            ':stats' => json_encode($input['stats']),
+            ':id'    => $id,
         ]);
         if ($stmt->rowCount() === 0) {
             sendJsonError('Espèce introuvable', 404);
