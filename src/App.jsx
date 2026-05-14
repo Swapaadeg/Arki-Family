@@ -17,6 +17,7 @@ import CreateEvent from './pages/Events/CreateEvent';
 import EditEvent from './pages/Events/EditEvent';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import TribesManagement from './pages/Admin/TribesManagement';
+import DinosManagement from './pages/Admin/DinosManagement';
 import MentionsLegales from './pages/Legal/MentionsLegales';
 import PolitiqueConfidentialite from './pages/Legal/PolitiqueConfidentialite';
 import CGU from './pages/Legal/CGU';
@@ -45,6 +46,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/tribes" element={<TribesManagement />} />
             <Route path="/admin/events" element={<EventsList />} />
+            <Route path="/admin/dinos" element={<DinosManagement />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/cgu" element={<CGU />} />

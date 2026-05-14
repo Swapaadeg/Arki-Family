@@ -1,0 +1,455 @@
+@use "sass:color";
+@use '../../../styles/base/variables' as *;
+@use '../../../styles/base/responsive' as *;
+@use '../../../styles/abstracts/mixins' as *;
+
+.dinos-management {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $neon-cyan;
+    margin: 0;
+    @include neon-text-shadow($neon-cyan, medium);
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  &__search {
+    padding: 0.6rem 1rem;
+    background: rgba($color-dark, 0.6);
+    border: 2px solid rgba($neon-cyan, 0.3);
+    border-radius: 8px;
+    color: $text-primary;
+    font-size: 0.95rem;
+    width: 220px;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $neon-cyan;
+      @include neon-shadow($neon-cyan, low);
+    }
+
+    &::placeholder {
+      color: rgba($text-primary, 0.4);
+    }
+  }
+
+  &__add-btn {
+    padding: 0.6rem 1.4rem;
+    background: linear-gradient(135deg, rgba($neon-cyan, 0.15), rgba($neon-purple, 0.15));
+    border: 2px solid $neon-cyan;
+    border-radius: 8px;
+    color: $neon-cyan;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+
+    &:hover {
+      background: linear-gradient(135deg, rgba($neon-cyan, 0.3), rgba($neon-purple, 0.3));
+      @include neon-shadow($neon-cyan, medium);
+    }
+  }
+
+  &__error {
+    padding: 1rem;
+    background: rgba($neon-pink, 0.1);
+    border: 1px solid rgba($neon-pink, 0.5);
+    border-radius: 8px;
+    color: $neon-pink;
+    margin-bottom: 1.5rem;
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4rem;
+    gap: 1rem;
+
+    p {
+      color: $neon-cyan;
+      font-weight: 600;
+    }
+  }
+
+  &__spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba($neon-cyan, 0.2);
+    border-top-color: $neon-cyan;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  &__table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid rgba($neon-cyan, 0.2);
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+
+    th {
+      padding: 0.9rem 1rem;
+      background: rgba($neon-cyan, 0.08);
+      color: $neon-cyan;
+      font-weight: 700;
+      text-align: left;
+      border-bottom: 2px solid rgba($neon-cyan, 0.3);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid rgba($neon-cyan, 0.1);
+      vertical-align: middle;
+      color: $text-primary;
+    }
+
+    tbody tr {
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: rgba($neon-cyan, 0.04);
+      }
+
+      &:last-child td {
+        border-bottom: none;
+      }
+    }
+  }
+
+  &__name {
+    font-weight: 600;
+    color: $neon-cyan;
+  }
+
+  &__order {
+    text-align: center;
+    color: rgba($text-primary, 0.6);
+    font-size: 0.9rem;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+  }
+
+  &__tag {
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 600;
+
+    &--type {
+      background: rgba($neon-purple, 0.15);
+      border: 1px solid rgba($neon-purple, 0.4);
+      color: $neon-purple;
+    }
+
+    &--stat {
+      background: rgba($neon-cyan, 0.1);
+      border: 1px solid rgba($neon-cyan, 0.3);
+      color: $neon-cyan;
+    }
+  }
+
+  &__actions-cell {
+    display: flex;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  &__edit-btn {
+    padding: 0.4rem 0.9rem;
+    background: rgba($neon-cyan, 0.1);
+    border: 1px solid rgba($neon-cyan, 0.4);
+    border-radius: 6px;
+    color: $neon-cyan;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba($neon-cyan, 0.2);
+      border-color: $neon-cyan;
+    }
+  }
+
+  &__delete-btn {
+    padding: 0.4rem 0.9rem;
+    background: rgba($neon-pink, 0.1);
+    border: 1px solid rgba($neon-pink, 0.4);
+    border-radius: 6px;
+    color: $neon-pink;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba($neon-pink, 0.2);
+      border-color: $neon-pink;
+    }
+  }
+
+  &__empty-row {
+    text-align: center;
+    color: rgba($text-primary, 0.5);
+    padding: 3rem !important;
+    font-style: italic;
+  }
+
+  // Modal
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(#000, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  &__modal {
+    background: linear-gradient(135deg, rgba($color-dark, 0.98), rgba(#0a0e27, 0.98));
+    border: 2px solid rgba($neon-cyan, 0.5);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    @include neon-shadow($neon-cyan, high);
+    animation: slideUp 0.25s ease;
+
+    &--small {
+      max-width: 420px;
+    }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  &__modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 2px solid rgba($neon-cyan, 0.3);
+
+    h2 {
+      margin: 0;
+      color: $neon-cyan;
+      font-size: 1.3rem;
+      @include neon-text-shadow($neon-cyan, low);
+    }
+  }
+
+  &__modal-close {
+    background: transparent;
+    border: none;
+    color: rgba($text-primary, 0.5);
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    transition: color 0.2s ease;
+
+    &:hover:not(:disabled) { color: $neon-pink; }
+    &:disabled { opacity: 0.3; cursor: not-allowed; }
+  }
+
+  &__modal-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      color: rgba($text-primary, 0.85);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 0.65rem 1rem;
+      background: rgba($color-dark, 0.6);
+      border: 2px solid rgba($neon-cyan, 0.3);
+      border-radius: 8px;
+      color: $text-primary;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+
+      &:focus {
+        outline: none;
+        border-color: $neon-cyan;
+        @include neon-shadow($neon-cyan, low);
+      }
+
+      &::placeholder { color: rgba($text-primary, 0.35); }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
+    }
+
+    &--half {
+      max-width: 140px;
+    }
+  }
+
+  &__checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.2rem;
+    padding: 0.75rem 1rem;
+    background: rgba($color-dark, 0.4);
+    border: 1px solid rgba($neon-cyan, 0.2);
+    border-radius: 8px;
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: $text-primary;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+      accent-color: $neon-cyan;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+
+      &:disabled { cursor: not-allowed; opacity: 0.5; }
+    }
+  }
+
+  &__form-error {
+    padding: 0.75rem 1rem;
+    background: rgba($neon-pink, 0.1);
+    border: 1px solid rgba($neon-pink, 0.4);
+    border-radius: 6px;
+    color: $neon-pink;
+    font-size: 0.9rem;
+  }
+
+  &__modal-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-top: 2px solid rgba($neon-cyan, 0.2);
+  }
+
+  &__modal-btn {
+    flex: 1;
+    padding: 0.7rem 1.25rem;
+    border-radius: 8px;
+    border: 2px solid;
+    background: transparent;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    &--cancel {
+      color: rgba($text-primary, 0.7);
+      border-color: rgba($text-primary, 0.3);
+
+      &:hover:not(:disabled) {
+        background: rgba($text-primary, 0.08);
+        border-color: rgba($text-primary, 0.5);
+      }
+    }
+
+    &--save {
+      color: $neon-cyan;
+      border-color: rgba($neon-cyan, 0.6);
+
+      &:hover:not(:disabled) {
+        background: rgba($neon-cyan, 0.15);
+        border-color: $neon-cyan;
+        @include neon-shadow($neon-cyan, low);
+      }
+    }
+
+    &--delete {
+      color: $neon-pink;
+      border-color: rgba($neon-pink, 0.6);
+
+      &:hover:not(:disabled) {
+        background: rgba($neon-pink, 0.15);
+        border-color: $neon-pink;
+        @include neon-shadow($neon-pink, medium);
+      }
+    }
+  }
+
+  @include max-md {
+    padding: 1rem;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__header-actions {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    &__search {
+      width: 100%;
+    }
+
+    &__add-btn {
+      width: 100%;
+    }
+  }
+}
