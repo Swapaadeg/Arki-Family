@@ -224,6 +224,7 @@ export const arkDinosaurs = [
   { name: 'Aberrant Ours Sinistre', types: [1] },
   { name: 'Aberrant Doedicurus', types: [2] },
   { name: 'Aberrant Electrophorus', types: [1, 3] },
+  { name: 'Aberrant Equus', types: [2] },
   { name: 'Aberrant Iguanodon', types: [2] },
   { name: 'Aberrant Lystrosaurus', types: [2] },
   { name: 'Aberrant Megalosaurus', types: [1] },

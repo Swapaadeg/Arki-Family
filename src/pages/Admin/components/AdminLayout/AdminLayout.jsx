@@ -10,6 +10,7 @@ const AdminLayout = ({ children }) => {
     { path: '/admin', label: 'Dashboard', icon: '📊' },
     { path: '/admin/tribes', label: 'Tribus', icon: '🏛️' },
     { path: '/admin/events', label: 'Événements', icon: '🎉' },
+    { path: '/admin/dinos', label: 'Espèces', icon: '🦖' },
   ];
 
   return (

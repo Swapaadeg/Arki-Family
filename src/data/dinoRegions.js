@@ -8,8 +8,7 @@ export const dinoRegions = {
     wikiName: 'Rex',
     regions: {
       0: { name: 'Corps' },
-      1: { name: 'Épine dorsale' },
-      3: { name: 'Reflets' },
+      1: { name: 'Épine' },
       4: { name: 'Dos' },
       5: { name: 'Ventre' },
     },
