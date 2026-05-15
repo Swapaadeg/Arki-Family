@@ -44,6 +44,9 @@ const DinosManagement = () => {
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [seeding, setSeeding] = useState(false);
+  const [seedResult, setSeedResult] = useState(null);
+
   useEffect(() => {
     if (user && !user.is_admin) navigate('/');
   }, [user, navigate]);
@@ -152,6 +155,20 @@ const DinosManagement = () => {
     }
   };
 
+  const handleSeed = async () => {
+    try {
+      setSeeding(true);
+      setSeedResult(null);
+      const res = await api.get('/admin/seed-dino-catalog.php');
+      setSeedResult(res.data.message);
+      fetchSpecies();
+    } catch (err) {
+      setSeedResult(err.response?.data?.message || 'Erreur lors du seed');
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   const filtered = species.filter(sp =>
     sp.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -174,11 +191,23 @@ const DinosManagement = () => {
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
+            <button
+              className="dinos-management__seed-btn"
+              onClick={handleSeed}
+              disabled={seeding}
+              title="Importer toutes les espèces ARK dans la base de données"
+            >
+              {seeding ? 'Import...' : 'Importer espèces ARK'}
+            </button>
             <button className="dinos-management__add-btn" onClick={openAdd}>
               + Ajouter
             </button>
           </div>
         </div>
+
+        {seedResult && (
+          <div className="dinos-management__seed-result">{seedResult}</div>
+        )}
 
         {error && (
           <div className="dinos-management__error">{error}</div>
