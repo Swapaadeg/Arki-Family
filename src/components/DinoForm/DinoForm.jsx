@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
+import arkDinosaurs from '../../data/dinosaurs';
 import dinoTypes from '../../data/types';
 import { baseStats, specialStats } from '../../data/stats';
 import ImageCropModal from '../ImageCropModal/ImageCropModal';
@@ -9,6 +10,20 @@ const ALL_STATS = [
   ...baseStats,
   ...specialStats,
 ];
+
+const OXYGEN_EXCEPTIONS = ['Spinosaure', 'Aberrant Spino'];
+const CRAFTING_SPECIES  = ['Helicoprion', 'Gacha'];
+
+const deriveStats = (dino) => {
+  const stats = ['health', 'stamina', 'food', 'weight', 'damage'];
+  if (!dino.types.includes(3) || OXYGEN_EXCEPTIONS.includes(dino.name)) {
+    stats.push('oxygen');
+  }
+  if (CRAFTING_SPECIES.includes(dino.name)) {
+    stats.push('crafting');
+  }
+  return stats;
+};
 
 const DinoForm = ({ onAddDino, existingDinos = [] }) => {
   const [catalog, setCatalog] = useState([]);
@@ -30,8 +45,23 @@ const DinoForm = ({ onAddDino, existingDinos = [] }) => {
 
   useEffect(() => {
     api.get('/dino-catalog.php')
-      .then(res => setCatalog(res.data))
-      .catch(() => setCatalog([]))
+      .then(res => {
+        const dbCatalog = res.data;
+        const dbNames = new Set(dbCatalog.map(d => d.name));
+        const staticFallback = arkDinosaurs
+          .filter(d => !dbNames.has(d.name))
+          .map(d => ({ id: null, name: d.name, types: d.types, stats: deriveStats(d) }));
+        const merged = [...dbCatalog, ...staticFallback]
+          .sort((a, b) => a.name.localeCompare(b.name));
+        setCatalog(merged);
+      })
+      .catch(() => {
+        setCatalog(
+          arkDinosaurs
+            .map(d => ({ id: null, name: d.name, types: d.types, stats: deriveStats(d) }))
+            .sort((a, b) => a.name.localeCompare(b.name))
+        );
+      })
       .finally(() => setCatalogLoading(false));
   }, []);
 
