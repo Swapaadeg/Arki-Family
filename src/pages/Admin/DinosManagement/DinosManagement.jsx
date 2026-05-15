@@ -1,30 +1,30 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
+import api from '../../../services/api';
 import AdminLayout from '../components/AdminLayout';
 import './DinosManagement.scss';
 
-const API_URL = '/api/admin/dino-species.php';
+const TYPES = [
+  { id: 1, label: 'Carnivore' },
+  { id: 2, label: 'Herbivore' },
+  { id: 3, label: 'Aquatique' },
+  { id: 4, label: 'Volant' },
+  { id: 5, label: 'Épaule' },
+  { id: 6, label: 'Boss' },
+];
 
-const TYPE_LABELS = {
-  1: 'Carnivore',
-  2: 'Herbivore',
-  3: 'Aquatique',
-  4: 'Volant',
-  5: 'Épaule',
-  6: 'Boss',
-};
+const STATS = [
+  { key: 'health',   label: 'Vie' },
+  { key: 'stamina',  label: 'Endurance' },
+  { key: 'oxygen',   label: 'Oxygène' },
+  { key: 'food',     label: 'Nourriture' },
+  { key: 'weight',   label: 'Poids' },
+  { key: 'damage',   label: 'Dégâts' },
+  { key: 'crafting', label: 'Craft' },
+];
 
-const TYPE_ICONS = {
-  1: '🦷',
-  2: '🌿',
-  3: '🌊',
-  4: '🦅',
-  5: '🫀',
-  6: '💀',
-};
-
-const EMPTY_FORM = { name: '', types: [], sort_order: 0 };
+const EMPTY_FORM = { name: '', types: [], stats: [] };
 
 const DinosManagement = () => {
   const navigate = useNavigate();
@@ -33,52 +33,54 @@ const DinosManagement = () => {
   const [species, setSpecies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [editingId, setEditingId] = useState(null);
-  const [formError, setFormError] = useState(null);
-  const [formLoading, setFormLoading] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-
   const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState(0);
+
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [formError, setFormError] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (user && !user.is_admin) navigate('/');
   }, [user, navigate]);
 
   const fetchSpecies = useCallback(async () => {
-    setLoading(true);
-    setError(null);
     try {
-      const res = await fetch(API_URL, { credentials: 'include' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erreur serveur');
-      setSpecies(data.species || []);
+      setLoading(true);
+      setError(null);
+      const res = await api.get('/admin/dino-species.php');
+      setSpecies(res.data);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || 'Erreur de chargement');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => { fetchSpecies(); }, [fetchSpecies]);
+  useEffect(() => {
+    fetchSpecies();
+  }, [fetchSpecies]);
 
   if (!user?.is_admin) return null;
 
-  const openCreate = () => {
-    setForm(EMPTY_FORM);
+  const openAdd = () => {
     setEditingId(null);
+    setForm(EMPTY_FORM);
     setFormError(null);
     setShowForm(true);
   };
 
   const openEdit = (sp) => {
-    setForm({ name: sp.name, types: [...sp.types], sort_order: sp.sort_order });
     setEditingId(sp.id);
+    setForm({
+      name:  sp.name,
+      types: sp.types.map(Number),
+      stats: sp.stats ?? [],
+    });
     setFormError(null);
     setShowForm(true);
   };
@@ -90,240 +92,270 @@ const DinosManagement = () => {
     setFormError(null);
   };
 
-  const toggleType = (typeId) => {
-    setForm(prev => ({
-      ...prev,
-      types: prev.types.includes(typeId)
-        ? prev.types.filter(t => t !== typeId)
-        : [...prev.types, typeId],
+  const toggleType = (id) => {
+    setForm(f => ({
+      ...f,
+      types: f.types.includes(id) ? f.types.filter(t => t !== id) : [...f.types, id],
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name.trim()) { setFormError('Le nom est requis'); return; }
-    if (form.types.length === 0) { setFormError('Sélectionne au moins un type'); return; }
+  const toggleStat = (key) => {
+    setForm(f => ({
+      ...f,
+      stats: f.stats.includes(key) ? f.stats.filter(s => s !== key) : [...f.stats, key],
+    }));
+  };
 
-    setFormLoading(true);
-    setFormError(null);
-
-    const isEdit = editingId !== null;
-    const url = isEdit ? `${API_URL}?id=${editingId}` : API_URL;
+  const handleSave = async () => {
+    if (!form.name.trim()) {
+      setFormError('Le nom est requis');
+      return;
+    }
+    if (form.types.length === 0) {
+      setFormError('Sélectionne au moins un type');
+      return;
+    }
+    if (form.stats.length === 0) {
+      setFormError('Sélectionne au moins une stat');
+      return;
+    }
 
     try {
-      const res = await fetch(url, {
-        method: isEdit ? 'PUT' : 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erreur serveur');
-
-      if (isEdit) {
-        setSpecies(prev => prev.map(s => s.id === editingId ? data.species : s));
+      setSaving(true);
+      setFormError(null);
+      const payload = { name: form.name.trim(), types: form.types, stats: form.stats };
+      if (editingId) {
+        await api.put(`/admin/dino-species.php?id=${editingId}`, payload);
       } else {
-        setSpecies(prev => [...prev, data.species]);
+        await api.post('/admin/dino-species.php', payload);
       }
       closeForm();
+      fetchSpecies();
     } catch (err) {
-      setFormError(err.message);
+      setFormError(err.response?.data?.message || 'Erreur lors de la sauvegarde');
     } finally {
-      setFormLoading(false);
+      setSaving(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!deleteConfirm) return;
-    setDeleteLoading(true);
+    if (!confirmDelete) return;
     try {
-      const res = await fetch(`${API_URL}?id=${deleteConfirm.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Erreur serveur');
-      setSpecies(prev => prev.filter(s => s.id !== deleteConfirm.id));
-      setDeleteConfirm(null);
+      setDeleting(true);
+      await api.delete(`/admin/dino-species.php?id=${confirmDelete.id}`);
+      setConfirmDelete(null);
+      fetchSpecies();
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || 'Erreur lors de la suppression');
     } finally {
-      setDeleteLoading(false);
+      setDeleting(false);
     }
   };
 
-  const displayed = species.filter(s => {
-    const matchSearch = !search || s.name.toLowerCase().includes(search.toLowerCase());
-    const matchType = !filterType || s.types.includes(filterType);
-    return matchSearch && matchType;
-  });
+  const filtered = species.filter(sp =>
+    sp.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const typeLabel = (id) => TYPES.find(t => t.id === id)?.label ?? id;
+  const statLabel = (key) => STATS.find(s => s.key === key)?.label ?? key;
 
   return (
     <AdminLayout>
       <div className="dinos-management">
         <div className="dinos-management__header">
           <h1 className="dinos-management__title">
-            <span className="dinos-management__title-icon">🦖</span>
             Catalogue des espèces
           </h1>
-          <button className="dinos-management__add-btn" onClick={openCreate}>
-            + Ajouter une espèce
-          </button>
-        </div>
-
-        {/* Filtres */}
-        <div className="dinos-management__filters">
-          <input
-            type="text"
-            placeholder="Rechercher..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="dinos-management__search"
-          />
-          <div className="dinos-management__type-filters">
-            <button
-              className={`dinos-management__type-btn ${filterType === 0 ? 'dinos-management__type-btn--active' : ''}`}
-              onClick={() => setFilterType(0)}
-            >
-              Tous
+          <div className="dinos-management__header-actions">
+            <input
+              className="dinos-management__search"
+              type="text"
+              placeholder="Rechercher..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            <button className="dinos-management__add-btn" onClick={openAdd}>
+              + Ajouter
             </button>
-            {Object.entries(TYPE_LABELS).map(([id, label]) => (
-              <button
-                key={id}
-                className={`dinos-management__type-btn ${filterType === Number(id) ? 'dinos-management__type-btn--active' : ''}`}
-                onClick={() => setFilterType(Number(id))}
-              >
-                {TYPE_ICONS[id]} {label}
-              </button>
-            ))}
           </div>
         </div>
 
-        {/* Erreur globale */}
         {error && (
-          <div className="dinos-management__error">
-            {error}
-            <button onClick={fetchSpecies} className="dinos-management__retry">Réessayer</button>
-          </div>
+          <div className="dinos-management__error">{error}</div>
         )}
 
-        {/* Liste */}
         {loading ? (
-          <div className="dinos-management__loading">Chargement...</div>
+          <div className="dinos-management__loading">
+            <div className="dinos-management__spinner" />
+            <p>Chargement...</p>
+          </div>
         ) : (
-          <div className="dinos-management__list">
-            <div className="dinos-management__count">{displayed.length} espèce{displayed.length !== 1 ? 's' : ''}</div>
-            {displayed.length === 0 ? (
-              <div className="dinos-management__empty">Aucune espèce trouvée</div>
-            ) : (
-              displayed.map(sp => (
-                <div key={sp.id} className="dinos-management__row">
-                  <div className="dinos-management__row-name">{sp.name}</div>
-                  <div className="dinos-management__row-types">
-                    {sp.types.map(t => (
-                      <span key={t} className="dinos-management__tag">
-                        {TYPE_ICONS[t]} {TYPE_LABELS[t]}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="dinos-management__row-actions">
-                    <button className="dinos-management__edit-btn" onClick={() => openEdit(sp)}>
-                      Modifier
-                    </button>
-                    <button className="dinos-management__delete-btn" onClick={() => setDeleteConfirm(sp)}>
-                      Supprimer
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
+          <div className="dinos-management__table-wrapper">
+            <table className="dinos-management__table">
+              <thead>
+                <tr>
+                  <th>Nom</th>
+                  <th>Types</th>
+                  <th>Stats</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="dinos-management__empty-row">
+                      {search ? 'Aucun résultat' : 'Aucune espèce enregistrée'}
+                    </td>
+                  </tr>
+                ) : (
+                  filtered.map(sp => (
+                    <tr key={sp.id}>
+                      <td className="dinos-management__name">{sp.name}</td>
+                      <td>
+                        <div className="dinos-management__tags">
+                          {(sp.types ?? []).map(t => (
+                            <span key={t} className="dinos-management__tag dinos-management__tag--type">
+                              {typeLabel(t)}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="dinos-management__tags">
+                          {(sp.stats ?? []).map(s => (
+                            <span key={s} className="dinos-management__tag dinos-management__tag--stat">
+                              {statLabel(s)}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="dinos-management__actions-cell">
+                        <button
+                          className="dinos-management__edit-btn"
+                          onClick={() => openEdit(sp)}
+                        >
+                          Modifier
+                        </button>
+                        <button
+                          className="dinos-management__delete-btn"
+                          onClick={() => setConfirmDelete(sp)}
+                        >
+                          Supprimer
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         )}
 
-        {/* Modal formulaire */}
+        {/* Form modal */}
         {showForm && (
-          <div className="dinos-management__overlay" onClick={closeForm}>
+          <div className="dinos-management__overlay" onClick={() => !saving && closeForm()}>
             <div className="dinos-management__modal" onClick={e => e.stopPropagation()}>
-              <h2 className="dinos-management__modal-title">
-                {editingId ? 'Modifier' : 'Ajouter'} une espèce
-              </h2>
-              <form onSubmit={handleSubmit} className="dinos-management__form">
-                <label className="dinos-management__label">
-                  Nom
+              <div className="dinos-management__modal-header">
+                <h2>{editingId ? 'Modifier l\'espèce' : 'Ajouter une espèce'}</h2>
+                <button className="dinos-management__modal-close" onClick={closeForm} disabled={saving}>✕</button>
+              </div>
+
+              <div className="dinos-management__modal-body">
+                <div className="dinos-management__field">
+                  <label>Nom de l'espèce</label>
                   <input
                     type="text"
                     value={form.name}
-                    onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="dinos-management__input"
-                    placeholder="Ex : Allosaurus"
-                    autoFocus
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    placeholder="Ex: Rex, Argentavis..."
+                    disabled={saving}
                   />
-                </label>
+                </div>
 
-                <div className="dinos-management__label">
-                  Types
+                <div className="dinos-management__field">
+                  <label>Types</label>
                   <div className="dinos-management__checkboxes">
-                    {Object.entries(TYPE_LABELS).map(([id, label]) => {
-                      const numId = Number(id);
-                      return (
-                        <label key={id} className={`dinos-management__checkbox ${form.types.includes(numId) ? 'dinos-management__checkbox--checked' : ''}`}>
-                          <input
-                            type="checkbox"
-                            checked={form.types.includes(numId)}
-                            onChange={() => toggleType(numId)}
-                          />
-                          {TYPE_ICONS[id]} {label}
-                        </label>
-                      );
-                    })}
+                    {TYPES.map(t => (
+                      <label key={t.id} className="dinos-management__checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={form.types.includes(t.id)}
+                          onChange={() => toggleType(t.id)}
+                          disabled={saving}
+                        />
+                        {t.label}
+                      </label>
+                    ))}
                   </div>
                 </div>
 
-                <label className="dinos-management__label">
-                  Ordre d'affichage
-                  <input
-                    type="number"
-                    value={form.sort_order}
-                    onChange={e => setForm(prev => ({ ...prev, sort_order: Number(e.target.value) }))}
-                    className="dinos-management__input dinos-management__input--small"
-                    min="0"
-                  />
-                </label>
-
-                {formError && <div className="dinos-management__form-error">{formError}</div>}
-
-                <div className="dinos-management__form-actions">
-                  <button type="button" className="dinos-management__cancel-btn" onClick={closeForm}>
-                    Annuler
-                  </button>
-                  <button type="submit" className="dinos-management__submit-btn" disabled={formLoading}>
-                    {formLoading ? 'Enregistrement...' : (editingId ? 'Enregistrer' : 'Ajouter')}
-                  </button>
+                <div className="dinos-management__field">
+                  <label>Stats applicables</label>
+                  <div className="dinos-management__checkboxes">
+                    {STATS.map(s => (
+                      <label key={s.key} className="dinos-management__checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={form.stats.includes(s.key)}
+                          onChange={() => toggleStat(s.key)}
+                          disabled={saving}
+                        />
+                        {s.label}
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </form>
+
+                {formError && (
+                  <div className="dinos-management__form-error">{formError}</div>
+                )}
+              </div>
+
+              <div className="dinos-management__modal-actions">
+                <button
+                  className="dinos-management__modal-btn dinos-management__modal-btn--cancel"
+                  onClick={closeForm}
+                  disabled={saving}
+                >
+                  Annuler
+                </button>
+                <button
+                  className="dinos-management__modal-btn dinos-management__modal-btn--save"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? 'Sauvegarde...' : editingId ? 'Modifier' : 'Ajouter'}
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Modal confirmation suppression */}
-        {deleteConfirm && (
-          <div className="dinos-management__overlay" onClick={() => setDeleteConfirm(null)}>
-            <div className="dinos-management__modal dinos-management__modal--confirm" onClick={e => e.stopPropagation()}>
-              <h2 className="dinos-management__modal-title">Supprimer l'espèce ?</h2>
-              <p className="dinos-management__confirm-text">
-                Confirmer la suppression de <strong>{deleteConfirm.name}</strong> ?
-                Cette action est irréversible.
-              </p>
-              <div className="dinos-management__form-actions">
-                <button className="dinos-management__cancel-btn" onClick={() => setDeleteConfirm(null)}>
+        {/* Delete confirmation */}
+        {confirmDelete && (
+          <div className="dinos-management__overlay" onClick={() => !deleting && setConfirmDelete(null)}>
+            <div className="dinos-management__modal dinos-management__modal--small" onClick={e => e.stopPropagation()}>
+              <div className="dinos-management__modal-header">
+                <h2>Supprimer l'espèce</h2>
+                <button className="dinos-management__modal-close" onClick={() => setConfirmDelete(null)} disabled={deleting}>✕</button>
+              </div>
+              <div className="dinos-management__modal-body">
+                <p>Supprimer <strong>{confirmDelete.name}</strong> ? Cette action est irréversible.</p>
+              </div>
+              <div className="dinos-management__modal-actions">
+                <button
+                  className="dinos-management__modal-btn dinos-management__modal-btn--cancel"
+                  onClick={() => setConfirmDelete(null)}
+                  disabled={deleting}
+                >
                   Annuler
                 </button>
                 <button
-                  className="dinos-management__delete-confirm-btn"
+                  className="dinos-management__modal-btn dinos-management__modal-btn--delete"
                   onClick={handleDelete}
-                  disabled={deleteLoading}
+                  disabled={deleting}
                 >
-                  {deleteLoading ? 'Suppression...' : 'Supprimer'}
+                  {deleting ? 'Suppression...' : 'Supprimer'}
                 </button>
               </div>
             </div>
