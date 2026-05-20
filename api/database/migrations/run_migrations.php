@@ -70,8 +70,9 @@ try {
                 $pdo->exec($statement);
                 $successCount++;
             } catch (PDOException $e) {
-                // Ignorer les erreurs "already exists" ou "duplicate column"
+                // Ignorer les erreurs "already exists", "duplicate column" ou "duplicate key"
                 if (stripos($e->getMessage(), 'Duplicate column') !== false ||
+                    stripos($e->getMessage(), 'Duplicate key') !== false ||
                     stripos($e->getMessage(), 'already exists') !== false) {
                     echo colorize("  ⚠ Déjà appliqué (ignoré)\n", 'yellow');
                     continue;
