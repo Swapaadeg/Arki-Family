@@ -13,15 +13,33 @@ $pdo  = getDbConnection();
 $user = requireAuth($pdo);
 if (!$user) exit;
 
+function deriveStats($types, $name) {
+    $oxygenExceptions = ['Spinosaure', 'Aberrant Spino'];
+    $craftingSpecies  = ['Helicoprion', 'Gacha'];
+    $stats = ['health', 'stamina', 'food', 'weight', 'damage'];
+    if (!in_array(3, $types) || in_array($name, $oxygenExceptions)) {
+        $stats[] = 'oxygen';
+    }
+    if (in_array($name, $craftingSpecies)) {
+        $stats[] = 'crafting';
+    }
+    return $stats;
+}
+
 try {
     $stmt = $pdo->query('SELECT id, name, types, stats FROM dino_species ORDER BY name ASC');
     $rows = $stmt->fetchAll();
     $result = array_map(function ($row) {
+        $types = json_decode($row['types']) ?? [];
+        $stats = json_decode($row['stats']) ?? [];
+        if (empty($stats)) {
+            $stats = deriveStats(array_map('intval', (array)$types), $row['name']);
+        }
         return [
             'id'    => (int) $row['id'],
             'name'  => $row['name'],
-            'types' => json_decode($row['types']) ?? [],
-            'stats' => json_decode($row['stats']) ?? [],
+            'types' => $types,
+            'stats' => $stats,
         ];
     }, $rows);
     sendJsonResponse($result);

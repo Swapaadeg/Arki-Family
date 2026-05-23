@@ -51,10 +51,12 @@ try {
 
         // Séparer les requêtes SQL
         $statements = array_filter(
-            array_map('trim', explode(';', $sql)),
+            array_map(function($stmt) {
+                // Strip single-line comments before checking emptiness
+                return trim(preg_replace('/^--[^\n]*/m', '', $stmt));
+            }, explode(';', $sql)),
             function($stmt) {
                 return !empty($stmt) &&
-                       !preg_match('/^--/', $stmt) &&
                        $stmt !== 'DELIMITER //' &&
                        $stmt !== 'DELIMITER ;';
             }
