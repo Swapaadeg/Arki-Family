@@ -135,7 +135,7 @@ const TribePage = () => {
       )}
 
       {/* Sélecteur de tribu (visible si membre de plusieurs tribus) */}
-      {allTribes.length > 1 && (
+      {allTribes.length >= 1 && (
         <div className="tribe-page__tribe-selector">
           <select
             value={selectedTribeId || ''}
