@@ -220,7 +220,6 @@ const DinoForm = ({ onAddDino, existingDinos = [] }) => {
                 className="dino-form__select"
                 value={formData.species}
                 onChange={handleSpeciesChange}
-                size={Math.max(2, Math.min(8, filteredSpecies.length + 1))}
                 required
               >
                 <option value="">Sélectionner une espèce</option>
