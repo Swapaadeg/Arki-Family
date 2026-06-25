@@ -558,37 +558,27 @@
   }
 }
 
-// Sélecteur de tribu
-.tribe-page {
-  &__tribe-selector {
-    position: absolute;
-    top: $spacing-xl;
-    left: $spacing-xl;
-    z-index: 10;
+.tribe-page__tribe-select {
+  margin-top: 0.75rem;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(var(--tribe-primary-rgb, 0, 240, 255), 0.6);
+  color: #fff;
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  outline: none;
+
+  &:hover,
+  &:focus {
+    border-color: rgba(var(--tribe-primary-rgb, 0, 240, 255), 1);
+    box-shadow: 0 0 8px rgba(var(--tribe-primary-rgb, 0, 240, 255), 0.3);
   }
 
-  &__tribe-select {
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid rgba(var(--tribe-primary-rgb, 0, 240, 255), 0.5);
+  option {
+    background: #1a1a2e;
     color: #fff;
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    cursor: pointer;
-    backdrop-filter: blur(6px);
-    max-width: 200px;
-    outline: none;
-
-    &:hover,
-    &:focus {
-      border-color: rgba(var(--tribe-primary-rgb, 0, 240, 255), 1);
-      box-shadow: 0 0 8px rgba(var(--tribe-primary-rgb, 0, 240, 255), 0.3);
-    }
-
-    option {
-      background: #1a1a2e;
-      color: #fff;
-    }
   }
 }
 

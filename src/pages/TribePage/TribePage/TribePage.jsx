@@ -134,20 +134,6 @@ const TribePage = () => {
         </Link>
       )}
 
-      {/* Sélecteur de tribu (visible si membre de plusieurs tribus) */}
-      {allTribes.length >= 1 && (
-        <div className="tribe-page__tribe-selector">
-          <select
-            value={selectedTribeId || ''}
-            onChange={e => selectTribe(parseInt(e.target.value, 10))}
-            className="tribe-page__tribe-select"
-          >
-            {allTribes.map(t => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
 
       {/* Avatar utilisateur */}
       {user && (
@@ -170,6 +156,17 @@ const TribePage = () => {
       <div className="tribe-page__header">
         <div className="tribe-page__header-content">
           <h1 className="tribe-page__title">{tribe.name}</h1>
+          {allTribes.length > 1 && (
+            <select
+              value={selectedTribeId || ''}
+              onChange={e => selectTribe(parseInt(e.target.value, 10))}
+              className="tribe-page__tribe-select"
+            >
+              {allTribes.map(t => (
+                <option key={t.id} value={t.id}>{t.name}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
