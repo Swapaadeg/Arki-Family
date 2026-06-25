@@ -152,6 +152,11 @@ const TribePage = () => {
         </Link>
       )}
 
+      {/* DEBUG TEMPORAIRE */}
+      <div style={{position:'fixed',top:0,left:0,zIndex:9999,background:'red',color:'white',padding:'8px',fontSize:'12px'}}>
+        allTribes: {allTribes.length} | ids: {allTribes.map(t=>t.id).join(',')}
+      </div>
+
       {/* Header avec titre */}
       <div className="tribe-page__header">
         <div className="tribe-page__header-content">
