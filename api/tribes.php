@@ -62,16 +62,50 @@ function handleGet($user) {
             return;
         }
 
-        // Si ?my est présent, récupérer la tribu de l'utilisateur
-        if (isset($_GET['my']) && $user) {
+        // ?mine → liste de toutes les tribus de l'utilisateur
+        if (isset($_GET['mine']) && $user) {
             $stmt = $pdo->prepare("
-                SELECT t.*, tm.role, tm.is_validated
+                SELECT t.id, t.name, t.slug, t.logo_url, tm.role
                 FROM tribe_members tm
                 JOIN tribes t ON tm.tribe_id = t.id
                 WHERE tm.user_id = ? AND tm.is_validated = 1
-                LIMIT 1
+                ORDER BY tm.role DESC, tm.joined_at ASC
             ");
             $stmt->execute([$user['id']]);
+            $tribes = $stmt->fetchAll();
+            sendJsonResponse(['tribes' => array_map(function($t) {
+                return [
+                    'id'       => (int)$t['id'],
+                    'name'     => $t['name'],
+                    'slug'     => $t['slug'],
+                    'logo_url' => getFullUrl($t['logo_url']),
+                    'role'     => $t['role'],
+                ];
+            }, $tribes)]);
+            return;
+        }
+
+        // Si ?my est présent, récupérer la tribu de l'utilisateur
+        if (isset($_GET['my']) && $user) {
+            $tribeIdFilter = isset($_GET['tribe_id']) ? (int)$_GET['tribe_id'] : null;
+            if ($tribeIdFilter) {
+                $stmt = $pdo->prepare("
+                    SELECT t.*, tm.role, tm.is_validated
+                    FROM tribe_members tm
+                    JOIN tribes t ON tm.tribe_id = t.id
+                    WHERE tm.user_id = ? AND tm.tribe_id = ? AND tm.is_validated = 1
+                ");
+                $stmt->execute([$user['id'], $tribeIdFilter]);
+            } else {
+                $stmt = $pdo->prepare("
+                    SELECT t.*, tm.role, tm.is_validated
+                    FROM tribe_members tm
+                    JOIN tribes t ON tm.tribe_id = t.id
+                    WHERE tm.user_id = ? AND tm.is_validated = 1
+                    LIMIT 1
+                ");
+                $stmt->execute([$user['id']]);
+            }
             $tribe = $stmt->fetch();
 
             if (!$tribe) {

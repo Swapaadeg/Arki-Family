@@ -413,10 +413,19 @@ export const tribeAPI = {
   },
 
   /**
-   * Récupérer la tribu de l'utilisateur connecté
+   * Récupérer toutes les tribus de l'utilisateur connecté (liste)
    */
-  getMy: async () => {
-    const response = await api.get('/tribes.php?my');
+  getMine: async () => {
+    const response = await api.get('/tribes.php?mine');
+    return response.data;
+  },
+
+  /**
+   * Récupérer la tribu de l'utilisateur connecté (avec membres)
+   */
+  getMy: async (tribeId) => {
+    const url = tribeId ? `/tribes.php?my&tribe_id=${tribeId}` : '/tribes.php?my';
+    const response = await api.get(url);
     if (import.meta.env.MODE !== 'production' && response.data.tribe) {
       response.data.tribe.banner_url = response.data.tribe.banner_url ? response.data.tribe.banner_url.replace('/api/', '/') : null;
       response.data.tribe.logo_url = response.data.tribe.logo_url ? response.data.tribe.logo_url.replace('/api/', '/') : null;

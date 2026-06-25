@@ -11,7 +11,7 @@ import '../../../styles/pages/tribe-page.scss';
 const TribePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { tribe, loading: tribeLoading, refreshTribe } = useTribe();
+  const { tribe, allTribes, selectedTribeId, selectTribe, loading: tribeLoading, refreshTribe } = useTribe();
   const [featuredDinos, setFeaturedDinos] = useState([]);
   const [dinosLoading, setDinosLoading] = useState(true);
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -132,6 +132,21 @@ const TribePage = () => {
           <span className="tribe-page__admin-icon">⚙️</span>
           <span className="tribe-page__admin-text">Admin</span>
         </Link>
+      )}
+
+      {/* Sélecteur de tribu (visible si membre de plusieurs tribus) */}
+      {allTribes.length > 1 && (
+        <div className="tribe-page__tribe-selector">
+          <select
+            value={selectedTribeId || ''}
+            onChange={e => selectTribe(parseInt(e.target.value, 10))}
+            className="tribe-page__tribe-select"
+          >
+            {allTribes.map(t => (
+              <option key={t.id} value={t.id}>{t.name}</option>
+            ))}
+          </select>
+        </div>
       )}
 
       {/* Avatar utilisateur */}
