@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { dinoAPI } from '../services/api';
 
-export const useDinosaurs = () => {
+export const useDinosaurs = (tribeId = null) => {
   const [dinos, setDinos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Charger tous les dinosaures
   const fetchDinosaurs = async () => {
+    if (!tribeId) return;
     try {
       setLoading(true);
-      const data = await dinoAPI.getAll();
+      const data = await dinoAPI.getAll(tribeId);
       setDinos(data);
       setError(null);
     } catch (error) {
@@ -21,10 +22,9 @@ export const useDinosaurs = () => {
     }
   };
 
-  // Charger les dinosaures au montage du composant
   useEffect(() => {
     fetchDinosaurs();
-  }, []);
+  }, [tribeId]);
 
   // Ajouter un dinosaure
   const addDinosaur = async (dinoData) => {

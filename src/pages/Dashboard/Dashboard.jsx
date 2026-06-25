@@ -14,8 +14,8 @@ import '../../styles/pages/dashboard.scss';
 function Dashboard() {
   const [searchParams] = useSearchParams();
   const initialFilter = searchParams.get('filter') || 'all';
-  const { dinos, loading, error, addDinosaur, updateDinosaur, deleteDinosaur, toggleFeatured, refreshDinosaurs } = useDinosaurs();
   const { tribe, loading: tribeLoading, refreshTribe } = useTribe();
+  const { dinos, loading, error, addDinosaur, updateDinosaur, deleteDinosaur, toggleFeatured, refreshDinosaurs } = useDinosaurs(tribe?.id);
   const { showToast } = useToast();
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);

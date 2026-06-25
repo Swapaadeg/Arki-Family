@@ -83,23 +83,36 @@ function handleGet($pdo, $user) {
             $stmt->execute([$tribeId]);
             $dinosaurs = $stmt->fetchAll();
         } else {
-            // Récupérer la tribu de l'utilisateur connecté
-            $stmt = $pdo->prepare("
-                SELECT t.id
-                FROM tribes t
-                JOIN tribe_members tm ON t.id = tm.tribe_id
-                WHERE tm.user_id = ? AND tm.is_validated = 1
-                LIMIT 1
-            ");
-            $stmt->execute([$user['id']]);
+            $tribeIdFilter = isset($_GET['tribe_id']) ? (int)$_GET['tribe_id'] : null;
+
+            if ($tribeIdFilter) {
+                // Vérifier que l'utilisateur est membre de cette tribu
+                $stmt = $pdo->prepare("
+                    SELECT t.id
+                    FROM tribes t
+                    JOIN tribe_members tm ON t.id = tm.tribe_id
+                    WHERE t.id = ? AND tm.user_id = ? AND tm.is_validated = 1
+                ");
+                $stmt->execute([$tribeIdFilter, $user['id']]);
+            } else {
+                // Fallback : première tribu de l'utilisateur
+                $stmt = $pdo->prepare("
+                    SELECT t.id
+                    FROM tribes t
+                    JOIN tribe_members tm ON t.id = tm.tribe_id
+                    WHERE tm.user_id = ? AND tm.is_validated = 1
+                    LIMIT 1
+                ");
+                $stmt->execute([$user['id']]);
+            }
+
             $tribe = $stmt->fetch();
 
             if (!$tribe) {
-                sendJsonResponse([]); // Pas de tribu = pas de dinosaures
+                sendJsonResponse([]);
                 return;
             }
 
-            // Retourner uniquement les dinosaures de la tribu de l'utilisateur
             $stmt = $pdo->prepare('SELECT d.*, au.username as assigned_username
                 FROM dinosaurs d
                 LEFT JOIN users au ON d.assigned_user_id = au.id
