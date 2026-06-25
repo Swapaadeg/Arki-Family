@@ -13,29 +13,24 @@ export const useTribe = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Charger la liste de toutes les tribus de l'utilisateur
-  useEffect(() => {
-    tribeAPI.getMine().then(data => {
-      const tribes = data.tribes || [];
-      setAllTribes(tribes);
-      // Si rien de sélectionné ou sélection invalide, prendre la première
-      if (tribes.length > 0) {
-        const valid = tribes.find(t => t.id === selectedTribeId);
-        if (!valid) {
-          const firstId = tribes[0].id;
-          localStorage.setItem(STORAGE_KEY, firstId);
-          setSelectedTribeId(firstId);
-        }
-      }
-    }).catch(() => {});
-  }, []);
-
-  // Charger les données de la tribu sélectionnée
   const loadTribe = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       const data = await tribeAPI.getMy(selectedTribeId);
+
+      // Mettre à jour la liste des tribus depuis la réponse
+      if (data.all_tribes?.length > 0) {
+        setAllTribes(data.all_tribes);
+        // Si la sélection courante n'est pas dans la liste, prendre la première
+        const valid = data.all_tribes.find(t => t.id === selectedTribeId);
+        if (!valid) {
+          const firstId = data.all_tribes[0].id;
+          localStorage.setItem(STORAGE_KEY, firstId);
+          setSelectedTribeId(firstId);
+        }
+      }
+
       setTribe(data.tribe ? { ...data.tribe, members: data.members || [] } : null);
     } catch (err) {
       console.error('Erreur lors du chargement de la tribu:', err);

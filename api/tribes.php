@@ -137,6 +137,25 @@ function handleGet($user) {
                 ];
             }, $members_raw);
 
+            // Récupérer toutes les tribus de l'utilisateur pour le sélecteur
+            $stmtAll = $pdo->prepare("
+                SELECT t.id, t.name, t.slug, t.logo_url, tm.role
+                FROM tribe_members tm
+                JOIN tribes t ON tm.tribe_id = t.id
+                WHERE tm.user_id = ? AND tm.is_validated = 1
+                ORDER BY tm.role DESC, tm.joined_at ASC
+            ");
+            $stmtAll->execute([$user['id']]);
+            $allTribes = array_map(function($t) {
+                return [
+                    'id'       => (int)$t['id'],
+                    'name'     => $t['name'],
+                    'slug'     => $t['slug'],
+                    'logo_url' => getFullUrl($t['logo_url']),
+                    'role'     => $t['role'],
+                ];
+            }, $stmtAll->fetchAll());
+
             sendJsonResponse([
                 'tribe' => [
                     'id' => (int)$tribe['id'],
@@ -156,7 +175,8 @@ function handleGet($user) {
                     'user_role' => $tribe['role'],
                     'current_user_id' => (int)$user['id']
                 ],
-                'members' => $members
+                'members' => $members,
+                'all_tribes' => $allTribes,
             ]);
             return;
         }
