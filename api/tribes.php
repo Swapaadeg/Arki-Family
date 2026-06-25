@@ -17,7 +17,7 @@ $pdo = getDbConnection();
 
 // Vérifier l'authentification pour toutes les routes sauf GET (liste publique)
 $user = null;
-if ($method !== 'GET' || isset($_GET['my'])) {
+if ($method !== 'GET' || isset($_GET['my']) || isset($_GET['mine'])) {
     $user = requireAuth($pdo);
 }
 
