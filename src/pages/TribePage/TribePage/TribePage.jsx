@@ -11,7 +11,7 @@ import '../../../styles/pages/tribe-page.scss';
 const TribePage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { tribe, allTribes, selectedTribeId, selectTribe, loading: tribeLoading, refreshTribe } = useTribe();
+  const { tribe, loading: tribeLoading, refreshTribe } = useTribe();
   const [featuredDinos, setFeaturedDinos] = useState([]);
   const [dinosLoading, setDinosLoading] = useState(true);
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -152,26 +152,10 @@ const TribePage = () => {
         </Link>
       )}
 
-      {/* DEBUG TEMPORAIRE */}
-      <div style={{position:'fixed',top:0,left:0,zIndex:9999,background:'red',color:'white',padding:'8px',fontSize:'12px'}}>
-        allTribes: {allTribes.length} | ids: {allTribes.map(t=>t.id).join(',')}
-      </div>
-
       {/* Header avec titre */}
       <div className="tribe-page__header">
         <div className="tribe-page__header-content">
           <h1 className="tribe-page__title">{tribe.name}</h1>
-          {allTribes.length > 1 && (
-            <select
-              value={selectedTribeId || ''}
-              onChange={e => selectTribe(parseInt(e.target.value, 10))}
-              className="tribe-page__tribe-select"
-            >
-              {allTribes.map(t => (
-                <option key={t.id} value={t.id}>{t.name}</option>
-              ))}
-            </select>
-          )}
         </div>
       </div>
 

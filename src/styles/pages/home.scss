@@ -349,6 +349,25 @@
     font-size: 1.3rem;
   }
 
+  &__tribe-select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    background: transparent;
+
+    option {
+      background: #1a1040;
+      color: #fff;
+    }
+  }
+
   &__btn-tribe-logo {
     width: 1.5rem;
     height: 1.5rem;

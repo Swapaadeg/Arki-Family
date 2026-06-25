@@ -8,7 +8,7 @@ import '../../styles/pages/home.scss';
 
 const Home = () => {
   const { isAuthenticated, logout, user } = useAuth();
-  const { tribe } = useTribe();
+  const { tribe, allTribes, selectedTribeId, selectTribe } = useTribe();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -90,27 +90,42 @@ const Home = () => {
                 <span className="home__btn-icon">🦖</span>
                 Mes dinosaures
               </Link>
-              <Link to="/dashboard" className="home__btn home__btn--accent">
-                {tribe && tribe.id ? (
-                  <>
-                    {tribe.logo_url ? (
-                      <img
-                        src={tribe.logo_url}
-                        alt={tribe.name}
-                        className="home__btn-tribe-logo"
-                      />
-                    ) : (
+              {allTribes.length > 1 ? (
+                <select
+                  className="home__btn home__btn--accent home__tribe-select"
+                  value={selectedTribeId || ''}
+                  onChange={e => {
+                    selectTribe(parseInt(e.target.value, 10));
+                    navigate('/dashboard');
+                  }}
+                >
+                  {allTribes.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <Link to="/dashboard" className="home__btn home__btn--accent">
+                  {tribe && tribe.id ? (
+                    <>
+                      {tribe.logo_url ? (
+                        <img
+                          src={tribe.logo_url}
+                          alt={tribe.name}
+                          className="home__btn-tribe-logo"
+                        />
+                      ) : (
+                        <span className="home__btn-icon">🏛️</span>
+                      )}
+                      <span>{tribe.name}</span>
+                    </>
+                  ) : (
+                    <>
                       <span className="home__btn-icon">🏛️</span>
-                    )}
-                    <span>{tribe.name}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="home__btn-icon">🏛️</span>
-                    <span>Créer ou rejoindre une tribu</span>
-                  </>
-                )}
-              </Link>
+                      <span>Créer ou rejoindre une tribu</span>
+                    </>
+                  )}
+                </Link>
+              )}
               <button onClick={handleLogout} className="home__btn home__btn--secondary">
                 <span className="home__btn-icon">🚪</span>
                 Déconnexion
