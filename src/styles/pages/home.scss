@@ -349,22 +349,107 @@
     font-size: 1.3rem;
   }
 
-  &__tribe-select {
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
-    border: none;
-    outline: none;
-    font-family: inherit;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #fff;
-    text-align: center;
-    background: transparent;
+  &__tribe-dropdown {
+    position: relative;
+    min-width: 200px;
 
-    option {
-      background: #1a1040;
-      color: #fff;
+    @include max-md {
+      width: 100%;
+    }
+
+    &__arrow {
+      font-size: 0.85rem;
+      margin-left: auto;
+      transition: transform 0.2s ease;
+      opacity: 0.8;
+
+      &--open {
+        transform: rotate(180deg);
+      }
+    }
+
+    &__menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 6, 30, 0.92);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba($neon-purple, 0.4);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 16px rgba($neon-purple, 0.15);
+    }
+
+    &__item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s ease, color 0.15s ease;
+
+      &:not(:last-child) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      &:hover {
+        background: rgba($neon-purple, 0.15);
+        color: #fff;
+      }
+
+      &--active {
+        color: $neon-purple;
+        background: rgba($neon-purple, 0.08);
+
+        &:hover {
+          background: rgba($neon-purple, 0.2);
+          color: $neon-pink;
+        }
+      }
+    }
+
+    &__logo {
+      width: 1.4rem;
+      height: 1.4rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
+
+    &__icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    &__name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2px 6px;
+      border-radius: 20px;
+      background: rgba($neon-purple, 0.25);
+      color: $neon-purple;
+      border: 1px solid rgba($neon-purple, 0.4);
+      flex-shrink: 0;
     }
   }
 

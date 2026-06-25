@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTribe } from '../../hooks/useTribe';
@@ -10,11 +10,25 @@ const Home = () => {
   const { isAuthenticated, logout, user } = useAuth();
   const { tribe, allTribes, selectedTribeId, selectTribe } = useTribe();
   const navigate = useNavigate();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, [dropdownOpen]);
 
   const handleLogout = async () => {
     await logout();
-    // Rester sur la page d'accueil après déconnexion
   };
+
+  const activeTribe = allTribes.find(t => t.id === selectedTribeId) || tribe;
 
   return (
     <div className="home">
@@ -91,18 +105,45 @@ const Home = () => {
                 Mes dinosaures
               </Link>
               {allTribes.length > 1 ? (
-                <select
-                  className="home__btn home__btn--accent home__tribe-select"
-                  value={selectedTribeId || ''}
-                  onChange={e => {
-                    selectTribe(parseInt(e.target.value, 10));
-                    navigate('/dashboard');
-                  }}
-                >
-                  {allTribes.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
+                <div className="home__tribe-dropdown" ref={dropdownRef}>
+                  <button
+                    className="home__btn home__btn--accent"
+                    onClick={() => setDropdownOpen(o => !o)}
+                  >
+                    {activeTribe?.logo_url ? (
+                      <img src={activeTribe.logo_url} alt={activeTribe.name} className="home__btn-tribe-logo" />
+                    ) : (
+                      <span className="home__btn-icon">🏛️</span>
+                    )}
+                    <span>{activeTribe?.name || 'Ma tribu'}</span>
+                    <span className={`home__tribe-dropdown__arrow${dropdownOpen ? ' home__tribe-dropdown__arrow--open' : ''}`}>
+                      ▾
+                    </span>
+                  </button>
+                  {dropdownOpen && (
+                    <div className="home__tribe-dropdown__menu">
+                      {allTribes.map(t => (
+                        <button
+                          key={t.id}
+                          className={`home__tribe-dropdown__item${t.id === selectedTribeId ? ' home__tribe-dropdown__item--active' : ''}`}
+                          onClick={() => {
+                            selectTribe(t.id);
+                            setDropdownOpen(false);
+                            navigate('/dashboard');
+                          }}
+                        >
+                          {t.logo_url ? (
+                            <img src={t.logo_url} alt={t.name} className="home__tribe-dropdown__logo" />
+                          ) : (
+                            <span className="home__tribe-dropdown__icon">🏛️</span>
+                          )}
+                          <span className="home__tribe-dropdown__name">{t.name}</span>
+                          {t.role === 'owner' && <span className="home__tribe-dropdown__badge">owner</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <Link to="/dashboard" className="home__btn home__btn--accent">
                   {tribe && tribe.id ? (
