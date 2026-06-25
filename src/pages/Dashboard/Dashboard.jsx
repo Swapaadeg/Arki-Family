@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Header from '../../components/Header';
 import DinoForm from '../../components/DinoForm';
@@ -6,45 +6,22 @@ import DinoList from '../../components/DinoList';
 import TribeSelector from '../../components/TribeSelector';
 import Footer from '../../components/Footer/Footer';
 import { useDinosaurs } from '../../hooks/useDinosaurs';
+import { useTribe } from '../../hooks/useTribe';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { tribeAPI } from '../../services/api';
 import '../../styles/pages/dashboard.scss';
 
 function Dashboard() {
   const [searchParams] = useSearchParams();
   const initialFilter = searchParams.get('filter') || 'all';
   const { dinos, loading, error, addDinosaur, updateDinosaur, deleteDinosaur, toggleFeatured, refreshDinosaurs } = useDinosaurs();
+  const { tribe, loading: tribeLoading, refreshTribe } = useTribe();
   const { showToast } = useToast();
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const [tribe, setTribe] = useState(null);
-  const [tribeLoading, setTribeLoading] = useState(true);
-
-  // Charger la tribu de l'utilisateur au montage
-  useEffect(() => {
-    loadTribe();
-  }, []);
-
-  const loadTribe = async () => {
-    try {
-      setTribeLoading(true);
-      const data = await tribeAPI.getMy();
-      setTribe(data.tribe ? {
-        ...data.tribe,
-        members: data.members || []
-      } : null);
-    } catch (err) {
-      console.error('Erreur lors du chargement de la tribu:', err);
-      setTribe(null);
-    } finally {
-      setTribeLoading(false);
-    }
-  };
 
   const handleTribeSelected = () => {
-    // Recharger la tribu et les dinosaures après création/adhésion
-    loadTribe();
+    refreshTribe();
     refreshDinosaurs();
   };
 
